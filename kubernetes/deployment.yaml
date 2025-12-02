@@ -1,0 +1,128 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cert-manager-acmesolver
+  labels:
+    app: cert-manager-acmesolver
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cert-manager-acmesolver
+  labels:
+    app: cert-manager-acmesolver
+rules:
+  - apiGroups: [""]
+    resources:
+      - pods
+      - services
+      - endpoints
+      - configmaps
+      - events
+      - secrets
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cert-manager-acmesolver
+  labels:
+    app: cert-manager-acmesolver
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cert-manager-acmesolver
+subjects:
+  - kind: ServiceAccount
+    name: cert-manager-acmesolver
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cert-manager-acmesolver
+  labels:
+    app: cert-manager-acmesolver
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cert-manager-acmesolver
+  template:
+    metadata:
+      labels:
+        app: cert-manager-acmesolver
+    spec:
+      serviceAccountName: cert-manager-acmesolver
+      containers:
+      - name: cert-manager-acmesolver
+        image: cleanstart/cert-manager-acmesolver:latest-dev
+        imagePullPolicy: IfNotPresent
+        # Binary is located at /usr/bin/acmesolver
+        command: ["/usr/bin/acmesolver"]
+        args:
+        - "--listen-port=8089"
+        env:
+        - name: SSL_CERT_FILE
+          value: /etc/ssl/certs/ca-certificates.crt
+        - name: PATH
+          value: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        ports:
+        - containerPort: 8089
+          name: http
+          protocol: TCP
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        livenessProbe:
+          tcpSocket:
+            port: 8089
+          initialDelaySeconds: 30
+          periodSeconds: 20
+          timeoutSeconds: 5
+          failureThreshold: 6
+        readinessProbe:
+          tcpSocket:
+            port: 8089
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 6
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+            - ALL
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: false
+      securityContext:
+        fsGroup: 1000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cert-manager-acmesolver
+  labels:
+    app: cert-manager-acmesolver
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8089
+    targetPort: 8089
+    protocol: TCP
+    name: http
+  selector:
+    app: cert-manager-acmesolver
+
