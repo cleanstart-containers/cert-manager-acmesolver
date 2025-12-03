@@ -4,7 +4,7 @@ A security-hardened container image for cert-manager's ACME HTTP-01 challenge so
 Enables automated TLS certificate provisioning from ACME-compatible certificate authorities such as Let’s Encrypt.  
 Optimized for Kubernetes, with non-root execution, restricted permissions, and minimal attack surface.
 
----
+- --
 
 ## Key Features
 
@@ -16,7 +16,7 @@ Optimized for Kubernetes, with non-root execution, restricted permissions, and m
 - Secure token handling with ephemeral pod lifecycle  
 - Supports Let’s Encrypt and all ACME-compatible certificate authorities  
 
----
+- --
 
 ## Common Use Cases
 
@@ -28,17 +28,17 @@ Optimized for Kubernetes, with non-root execution, restricted permissions, and m
 - CI/CD pipeline certificate provisioning  
 - Microservices certificate automation in Kubernetes  
 
----
+- --
 
 ## Image Details
 
-**Image:** `cleanstart/cert-manager-acmesolver:latest`  
-**Port:** `8089` (ACME solver HTTP port)  
-**User:** Non-root (`clnstrt`, UID 1000)  
-**Binary:** `/usr/bin/acmesolver`  
-**SSL Certificates:** Included at `/etc/ssl/certs/ca-certificates.crt`  
+- *Image:** `cleanstart/cert-manager-acmesolver:latest`  
+- *Port:** `8089` (ACME solver HTTP port)  
+- *User:** Non-root (`clnstrt`, UID 1000)  
+- *Binary:** `/usr/bin/acmesolver`  
+- *SSL Certificates:** Included at `/etc/ssl/certs/ca-certificates.crt`  
 
----
+- --
 
 ## How It Works
 
@@ -48,16 +48,18 @@ Optimized for Kubernetes, with non-root execution, restricted permissions, and m
 - Provides health checks at `/` for readiness/liveness  
 - Pod is created on-demand and removed after challenge completion  
 
----
+- --
 
 ## Kubernetes Deployment
 
 ### Important Environment Variables
+
 - `SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt`  
 - `POD_NAME` (auto-populated by the downward API)  
 - `POD_NAMESPACE` (auto-populated by the downward API)  
 
 ### Required RBAC Permissions  
+
 Namespace-scoped access to:
 - Pods  
 - Services  
@@ -66,7 +68,7 @@ Namespace-scoped access to:
 - Secrets  
 - Events  
 
----
+- --
 
 ## Best Practices
 
@@ -78,17 +80,15 @@ Namespace-scoped access to:
 - Keep the container updated regularly  
 - Validate ACME Issuer and Certificate configuration in cert-manager  
 
----
+- --
 
 ## Resources
 
-- Official Documentation: https://cert-manager.io/docs/  
-- View Provenance, SBOM, Signature: https://images.cleanstart.com/images/cert-manager-acmesolver  
-- CleanStart All Images: https://images.cleanstart.com  
-- CleanStart Community Images: https://hub.docker.com/u/cleanstart  
-- Docker Hub Repository: https://hub.docker.com/r/cleanstart/cert-manager-acmesolver  
-
----
+- **Official Documentation:** https://cert-manager.io/docs/
+- **Provenance / SBOM / Signature:** https://images.cleanstart.com/images/cert-manager-acmesolver
+- **Docker Hub:** https://hub.docker.com/r/cleanstart/cert-manager-acmesolver
+- **CleanStart All Images:** https://images.cleanstart.com
+- **CleanStart Community Images:** https://hub.docker.com/u/cleanstart
 
 ## Vulnerability Disclaimer
 
