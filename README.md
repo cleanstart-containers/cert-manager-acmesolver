@@ -32,7 +32,7 @@ Optimized for Kubernetes, with non-root execution, restricted permissions, and m
 
 ## Image Details
 
-- *Image:** `cleanstart/cert-manager-acmesolver:latest`  
+- *Image:** `ghcr.io/cleanstart-containers/cert-manager-acmesolver:latest`  
 - *Port:** `8089` (ACME solver HTTP port)  
 - *User:** Non-root (`clnstrt`, UID 1000)  
 - *Binary:** `/usr/bin/acmesolver`  
@@ -73,7 +73,7 @@ Namespace-scoped access to:
 ## Best Practices
 
 - Configure cert-manager using:  
-`ACME_HTTP01_SOLVER_IMAGE=cleanstart/cert-manager-acmesolver`  
+`ACME_HTTP01_SOLVER_IMAGE=ghcr.io/cleanstart-containers/cert-manager-acmesolver`  
 - Set CPU and memory limits for predictable behavior  
 - Use Kubernetes readiness & liveness probes  
 - Apply network policies if needed  
