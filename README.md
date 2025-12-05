@@ -40,6 +40,39 @@ Optimized for Kubernetes, with non-root execution, restricted permissions, and m
 
 - --
 
+## Getting Started
+
+### Pull Commands
+
+Download the runtime container images:
+```bash
+docker pull ghcr.io/cleanstart-containers/cert-manager-acmesolver:latest
+```
+```bash
+docker pull ghcr.io/cleanstart-containers/cert-manager-acmesolver:latest-dev
+```
+
+### Basic Test Run
+
+Run the container with a basic test command:
+```bash
+kubectl run acmesolver-test \
+  --image=ghcr.io/cleanstart-containers/cert-manager-acmesolver:latest-dev \
+  --restart=Never \
+  -- /usr/bin/acmesolver --help
+```
+
+### Production Deployment
+
+Recommended production deployment with hardened security:
+```bash
+docker run -d --name cert-manager-acmesolver-prod \
+  --read-only \
+  --security-opt=no-new-privileges \
+  --user 1000:1000 \
+  ghcr.io/cleanstart-containers/cert-manager-acmesolver:latest
+```
+
 ## How It Works
 
 - Serves ACME HTTP-01 challenge responses at:  
