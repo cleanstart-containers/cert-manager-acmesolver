@@ -148,7 +148,7 @@ To use this custom acmesolver image with cert-manager, you need to configure the
 
 ```bash
 # Verify cert-manager is installed
-kubectl get deployment -n cert-manager
+kubectl get deployment
 
 # You should see a deployment named 'cert-manager'
 ```
@@ -161,7 +161,7 @@ You have two options:
 
 ```bash
 # Open the cert-manager controller deployment in your default editor
-kubectl edit deployment cert-manager -n cert-manager
+kubectl edit deployment cert-manager-acmesolver
 ```
 
 In the editor, find the `containers` section for the `cert-manager` container and add the environment variable to the `env` array:
@@ -185,8 +185,7 @@ Save and close the editor. Kubernetes will automatically restart the cert-manage
 
 ```bash
 # Patch the deployment directly without opening an editor
-kubectl set env deployment/cert-manager \
-  -n cert-manager \
+kubectl set env deployment/cert-manager-acmesolver \
   ACME_HTTP01_SOLVER_IMAGE=cleanstart/cert-manager-acmesolver:latest-dev
 ```
 
@@ -201,14 +200,14 @@ After adding the environment variable, verify it was applied correctly:
 
 ```bash
 # Check the cert-manager controller deployment
-kubectl get deployment cert-manager -n cert-manager -o yaml | grep -A 5 ACME_HTTP01_SOLVER_IMAGE
+kubectl get deployment cert-manager-acmesolver -o yaml | grep -A 5 ACME_HTTP01_SOLVER_IMAGE
 
 # Or describe the deployment
-kubectl describe deployment cert-manager -n cert-manager | grep ACME_HTTP01_SOLVER_IMAGE
+kubectl describe deployment cert-manager-acmesolver | grep ACME_HTTP01_SOLVER_IMAGE
 
 # Check the running pod's environment
-kubectl get pods -n cert-manager -l app.kubernetes.io/name=cert-manager
-kubectl exec -n cert-manager <cert-manager-pod-name> -- env | grep ACME_HTTP01_SOLVER_IMAGE
+kubectl get pods -l app.kubernetes.io/name=cert-manager-acmesolver
+kubectl exec <cert-manager-pod-name> -- env | grep ACME_HTTP01_SOLVER_IMAGE
 ```
 
 ### Step 4: Test with an ACME Certificate Request
@@ -219,11 +218,16 @@ When cert-manager creates an ACME challenge pod, verify it uses your custom imag
 # Create a test Certificate resource that triggers an ACME challenge
 # (This requires a properly configured ACME Issuer/ClusterIssuer)
 
+kubectl run test-solver \
+  --image=cleanstart/cert-manager-acmesolver:latest-dev \
+  --restart=Never \
+  --labels='acme.cert-manager.io/http01-solver=true' \
+  -- --help
 # Watch for ACME solver pods
 kubectl get pods --all-namespaces -l acme.cert-manager.io/http01-solver=true -w
 
 # When a solver pod is created, check its image
-kubectl describe pod <solver-pod-name> -n <namespace> | grep Image
+kubectl describe pod <solver-pod-name> | grep Image
 ```
 
 The solver pod should show:
@@ -243,10 +247,10 @@ Image: cleanstart/cert-manager-acmesolver:latest-dev
 
 ```bash
 # Verify the environment variable is set
-kubectl get deployment cert-manager -n cert-manager -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="ACME_HTTP01_SOLVER_IMAGE")]}'
+kubectl get deployment cert-manager-acmesolver -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="ACME_HTTP01_SOLVER_IMAGE")]}'
 
 # Check cert-manager controller logs for errors
-kubectl logs -n cert-manager deployment/cert-manager | grep -i acme
+kubectl logs deployment/cert-manager-acmesolver | grep -i acme
 
 # Ensure the image is accessible from your cluster
 kubectl run test --image=cleanstart/cert-manager-acmesolver:latest-dev --rm -it --restart=Never -- /bin/sh
@@ -275,7 +279,7 @@ To verify it's working:
 To remove the deployment:
 
 ```bash
-kubectl delete -f deployment.yaml
+kubectl delete -f .
 ```
 
 Or delete individual resources:
