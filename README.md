@@ -120,7 +120,7 @@ Namespace-scoped access to:
 - **Official Documentation:** https://cert-manager.io/docs/
 - **Provenance / SBOM / Signature:** https://images.cleanstart.com/images/cert-manager-acmesolver
 - **Docker Hub:** https://hub.docker.com/r/cleanstart/cert-manager-acmesolver
-- **CleanStart All Images:** https://images.cleanstart.com
+- **CleanStart All Images:** https://images.cleanstart.com/images/cert-manager-acmesolver/details
 - **CleanStart Community Images:** https://hub.docker.com/u/cleanstart
 
 ## Vulnerability Disclaimer
